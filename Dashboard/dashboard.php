@@ -1,7 +1,8 @@
 <?php
+include '../koneksi/koneksi.php';
 @$page =  $_GET['page'];
 if ($page == '') {
-    $page =  'dashboard';
+    // $page =  'dashboard';
 }
 ?>
 
@@ -38,12 +39,15 @@ if ($page == '') {
                             case 'laporan':
                                 include '../Components/tabel.php';
                                 break;
+                            case 'bayar-kas':
+                                include '../Components/bayar_kas.php';
+                                break;
                             default:
-                                include './dashboard_admin.php?page=dashboard';
+                                include './dashboard.php?page=dashboard';
                                 break;
                         }
                     } else {
-                        include './dashboard_admin.php?page=dashboard';
+                        include './dashboard.php?page=dashboard';
                     }
                     ?>
                 </div>

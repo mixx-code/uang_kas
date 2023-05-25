@@ -1,5 +1,4 @@
 <?php
-include '../koneksi/koneksi.php';
 $anggota = mysqli_query($koneksi, "SELECT * FROM anggota ORDER BY nama ASC");
 $kas = mysqli_query($koneksi, "SELECT anggota.nama, anggota.nim, kas.minggu_1, kas.minggu_2, kas.minggu_3, kas.minggu_4, kas.id_admin, kas.tanggal_bayar
 FROM anggota
@@ -48,50 +47,99 @@ if (date('m') != date('m', strtotime('+1 day'))) {
             echo date('m');
             echo date('m', strtotime('+1 day'))
             ?> -->
-    <table>
-        <thead>
-            <tr>
-                <th>NO</th>
-                <th>NAMA</th>
-                <th>MINGGU 1</th>
-                <th>MINGGU 2</th>
-                <th>MINGGU 3</th>
-                <th>MINGGU 4</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            if ($kas) {
-                if (mysqli_num_rows($kas) > 0) {
-                    $i = 1;
-                    // Tampilkan data
-                    while ($data = mysqli_fetch_assoc($kas)) {
-            ?>
-                        <tr>
-                            <td><?= $i ?></td>
-                            <td><?= $data['nama'] ?></td>
-                            <td><?= $data['minggu_1'] == 0 ? '<a href="">bayar sekarang</a>' : 'Rp.' . $data['minggu_1'] ?></td>
-                            <td><?= $data['minggu_1'] == 0 ? '<--' : ($data['minggu_2'] > 0 ? 'Rp.' . $data['minggu_2'] : '<a href="">bayar sekarang</a>') ?></td>
-                            <td><?= ($data['minggu_1'] == 0 || $data['minggu_2'] == 0) ? '<--' : ($data['minggu_3'] > 0 ? 'Rp.' . $data['minggu_3'] : '<a href="">bayar sekarang</a>') ?></td>
-                            <td><?= ($data['minggu_1'] == 0 || $data['minggu_3'] == 0) ? '<--' : ($data['minggu_4'] > 0 ? 'Rp.' . $data['minggu_4'] : '<a href="">bayar sekarang</a>') ?></td>
-                        </tr>
+    <?php if (isset($_SESSION["id_admin"])) : ?>
+        <table>
+            <thead>
+                <tr>
+                    <th>NO</th>
+                    <th>NAMA</th>
+                    <th>MINGGU 1</th>
+                    <th>MINGGU 2</th>
+                    <th>MINGGU 3</th>
+                    <th>MINGGU 4</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if ($kas) {
+                    if (mysqli_num_rows($kas) > 0) {
+                        $i = 1;
+                        // Tampilkan data
+                        while ($data = mysqli_fetch_assoc($kas)) {
+                ?>
+                            <tr>
+                                <td><?= $i ?></td>
+                                <td><?= $data['nama'] ?></td>
+                                <td>
+                                    <?= $data['minggu_1'] == 0 ? '<a class="btn-bayar" href="../Dashboard/dashboard.php?page=bayar-kas&minggu=1&nim=' . $data["nim"] . '">bayar sekarang</a>' : ($data['minggu_2'] > 0 ? $data['minggu_1'] : '<a onClick="return confirm(`Apa anda mau batal bayar kas ini?`)" href="../koneksi/batal_bayar.php?minggu=1&nim=' . $data["nim"] . '">' . 'Rp.' . $data['minggu_1'] . '</a>') ?>
+                                </td>
+                                <td><?= $data['minggu_1'] == 0 ? '<--' : ($data['minggu_2'] > 0 ? ($data['minggu_3'] > 0 ? $data['minggu_2'] : '<a onClick="return confirm(`Apa anda mau batal bayar kas ini?`)" href="../koneksi/batal_bayar.php?minggu=2&nim=' . $data["nim"] . '">' . 'Rp.' . $data['minggu_2'] . '</a>') : '<a class="btn-bayar" href="../Dashboard/dashboard.php?page=bayar-kas&minggu=2&nim=' . $data["nim"] . '">bayar sekarang</a>') ?></td>
+                                <td><?= ($data['minggu_1'] == 0 || $data['minggu_2'] == 0) ? '<--' : ($data['minggu_3'] > 0 ? ($data['minggu_4'] > 0 ? $data['minggu_3'] : '<a onClick="return confirm(`Apa anda mau batal bayar kas ini?`)" href="../koneksi/batal_bayar.php?minggu=3&nim=' . $data["nim"] . '">' . 'Rp.' . $data['minggu_3'] . '</a>') : '<a class="btn-bayar" href="../Dashboard/dashboard.php?page=bayar-kas&minggu=3&nim=' . $data["nim"] . '">bayar sekarang</a>') ?></td>
+                                <td><?= ($data['minggu_1'] == 0 || $data['minggu_3'] == 0) ? '<--' : ($data['minggu_4'] > 0 ? ($data['minggu_4'] > 0 ? '<a onClick="return confirm(`Apa anda mau batal bayar kas ini?`)" href="../koneksi/batal_bayar.php?minggu=4&nim=' . $data["nim"] . '">' . 'Rp.' . $data['minggu_4'] . '</a>' : '') : '<a class="btn-bayar" href="../Dashboard/dashboard.php?page=bayar-kas&minggu=4&nim=' . $data["nim"] . '">bayar sekarang</a>') ?></td>
+                            </tr>
 
-            <?php
-                        $i++;
+                <?php
+                            $i++;
+                        }
+                    } else {
+                        echo "<tr><td colspan='6'>BELUM ADA YANG BAYAR KAS</td></tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='6'>BELUM ADA YANG BAYAR KAS</td></tr>";
-                }
-            } else {
-                echo "Error: " . mysqli_error($conn);
-            } ?>
-        </tbody>
-    </table>
+                    echo "Error: " . mysqli_error($conn);
+                } ?>
+            </tbody>
+        </table>
+    <?php else : ?>
+        <table>
+            <thead>
+                <tr>
+                    <th>NO</th>
+                    <th>NAMA</th>
+                    <th>MINGGU 1</th>
+                    <th>MINGGU 2</th>
+                    <th>MINGGU 3</th>
+                    <th>MINGGU 4</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if ($kas) {
+                    if (mysqli_num_rows($kas) > 0) {
+                        $i = 1;
+                        // Tampilkan data
+                        while ($data = mysqli_fetch_assoc($kas)) {
+                ?>
+                            <tr>
+                                <td><?= $i ?></td>
+                                <td><?= $data['nama'] ?></td>
+                                <td>
+                                    <?= $data['minggu_1'] == 0 ? '<p class="btn-belum-bayar">Belum Bayar</p>' : 'Rp. ' . $data['minggu_1'] ?>
+                                </td>
+                                <td><?= $data['minggu_1'] == 0 ? '<p class="btn-belum-bayar">Belum Bayar</p>' : ($data['minggu_2'] > 0 ? 'Rp.' . $data['minggu_2'] : '<p class="btn-belum-bayar">Belum Bayar</p>') ?></td>
+                                <td><?= ($data['minggu_1'] == 0 || $data['minggu_2'] == 0) ? '<p class="btn-belum-bayar">Belum Bayar</p>' : ($data['minggu_3'] > 0 ? 'Rp.' . $data['minggu_3'] : '<p class="btn-belum-bayar">Belum Bayar</p>') ?></td>
+                                <td><?= ($data['minggu_1'] == 0 || $data['minggu_3'] == 0) ? '<p class="btn-belum-bayar">Belum Bayar</p>' : ($data['minggu_4'] > 0 ? 'Rp.' . $data['minggu_4'] : '<p class="btn-belum-bayar">Belum Bayar</p>') ?></td>
+                            </tr>
+
+                <?php
+                            $i++;
+                        }
+                    } else {
+                        echo "<tr><td colspan='6'>BELUM ADA YANG BAYAR KAS</td></tr>";
+                    }
+                } else {
+                    echo "Error: " . mysqli_error($conn);
+                } ?>
+            </tbody>
+        </table>
+    <?php endif ?>
+
 <?php elseif ($page == 'anggota') : ?>
     <table>
         <thead>
             <tr>
-                <th colspan="6" style="text-align: start;"><a style="margin-left: 20px;" href="">Tambah Anggota</a></th>
+                <?php if (isset($_SESSION["id_admin"])) : ?>
+                    <th colspan="6" style="text-align: start;"><a style="margin-left: 20px;" href="../Tambah_anggota/tambah_anggota.php">Tambah Anggota</a></th>
+                <?php endif ?>
             </tr>
             <tr>
                 <th>NO</th>
@@ -99,7 +147,9 @@ if (date('m') != date('m', strtotime('+1 day'))) {
                 <th>NAMA</th>
                 <th>KELAS</th>
                 <th>JENIS KELAMIN</th>
-                <th>HANDLE</th>
+                <?php if (isset($_SESSION["id_admin"])) : ?>
+                    <th>HANDLE</th>
+                <?php endif ?>
             </tr>
         </thead>
         <tbody>
@@ -112,7 +162,10 @@ if (date('m') != date('m', strtotime('+1 day'))) {
                         <td><?= $data['nama'] ?></td>
                         <td><?= $data['kelas'] ?></td>
                         <td><?= $data['jenis_kelamin'] ?></td>
-                        <td><a href="" class="edit">Edit</a><a href="" class="delete">Delete</a></td>
+                        <?php if (isset($_SESSION["id_admin"])) : ?>
+                            <td><a href="" class="edit">Edit</a><a href="" class="delete">Delete</a></td>
+                        <?php endif ?>
+
                     </tr>
                     <?php $i++; ?>
                 <?php endwhile; ?>
